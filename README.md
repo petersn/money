@@ -1,4 +1,5 @@
 money
 =====
 
-My bitcoin private keys, secret shared.
+My electrum seed, secret shared, 4 out of 7.
+

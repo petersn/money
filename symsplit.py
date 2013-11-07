@@ -17,6 +17,9 @@ def hashalg(s):
 		s = hashlib.sha512(s).digest()
 	return s
 
+def verify_share(s):
+	return hashalg(s[:-1])[0] == s[-1]
+
 def ser(l):
 	return "".join(i.encode("hex")+":" for i in l)
 
@@ -28,7 +31,7 @@ def symmetric(block, key, operation):
 	os.write(out_fd, key.encode("hex"))
 	os.close(out_fd)
 	operation = {"enc": "--symmetric", "dec": "--decrypt"}[operation]
-	proc = subprocess.Popen(["gpg", operation, "--cipher-algo", "AES", "--passphrase-fd", str(in_fd), "-"],
+	proc = subprocess.Popen(["gpg", "-q", operation, "--cipher-algo", "AES", "--passphrase-fd", str(in_fd), "-"],
 		stdin=subprocess.PIPE,
 		stdout=subprocess.PIPE,
 		stderr=subprocess.PIPE)
@@ -61,8 +64,7 @@ def split_secret(secret, n, k):
 
 def join_shares(shares, common):
 	# Verify the shares.
-	assert all(hashalg(share[:-1])[0] == share[-1] for share in shares), \
-		"Invalid checksum on share."
+	assert all(map(verify_share, shares)), "Invalid checksum on share."
 	shares.sort()
 	key = hashalg("".join(shares))
 	# Extract the appropriate encrypted block.
@@ -92,7 +94,9 @@ if __name__ == "__main__":
 		shares = []
 		n, k = map(ord, common[:2])
 		for i in xrange(k):
-			shares.append(getpass.getpass("Share %i/%i: " % (i+1, k)).strip().decode("hex"))
+			share = getpass.getpass("Share %i/%i: " % (i+1, k)).strip().decode("hex")
+			assert verify_share(share), "Invalid share."
+			shares.append(share)
 		block = join_shares(shares, common)
 		print block
 	else:
