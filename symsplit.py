@@ -78,7 +78,7 @@ def join_shares(shares, common):
 
 if __name__ == "__main__":
 	import sys, getpass
-	if len(sys.argv) == 3:
+	if len(sys.argv) == 4:
 		n, k = map(int, sys.argv[2:])
 		#secret = getpass.getpass("Paste in secret data: ")
 		secret = open(sys.argv[1]).read()
@@ -90,7 +90,7 @@ if __name__ == "__main__":
 		fd = open("common", "w")
 		fd.write(common+"\n")
 		fd.close()
-	elif len(sys.argv) == 2:
+	elif len(sys.argv) == 3:
 		common = deser(open(sys.argv[1]).read())
 		shares = []
 		n, k = map(ord, common[:2])
@@ -103,10 +103,10 @@ if __name__ == "__main__":
 		fd.write(block)
 		fd.close()
 	else:
-		print "usage: symsplit n k | symsplit common"
-		print "If 2 arguments:"
+		print "usage: symsplit file n k | symsplit common output"
+		print "If 3 arguments:"
 		print "  Writes out files share0, share1, ... share{n-1}, and common."
-		print "If 1 argument:"
-		print "  Writes the results to stdout."
+		print "If 2 argument:"
+		print "  Writes the results to output."
 		exit(2)
 
