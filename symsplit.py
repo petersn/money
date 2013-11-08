@@ -82,7 +82,7 @@ if __name__ == "__main__":
 		n, k = map(int, sys.argv[2:])
 		#secret = getpass.getpass("Paste in secret data: ")
 		secret = open(sys.argv[1]).read()
-		shares, common = split_secnret(secret, n, k)
+		shares, common = split_secret(secret, n, k)
 		for i, share in enumerate(shares):
 			fd = open("share%i" % i, "w")
 			fd.write(share.encode("hex") + "\n")
