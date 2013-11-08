@@ -79,9 +79,10 @@ def join_shares(shares, common):
 if __name__ == "__main__":
 	import sys, getpass
 	if len(sys.argv) == 3:
-		n, k = map(int, sys.argv[1:])
-		secret = getpass.getpass("Paste in secret data: ")
-		shares, common = split_secret(secret, n, k)
+		n, k = map(int, sys.argv[2:])
+		#secret = getpass.getpass("Paste in secret data: ")
+		secret = open(sys.argv[1]).read()
+		shares, common = split_secnret(secret, n, k)
 		for i, share in enumerate(shares):
 			fd = open("share%i" % i, "w")
 			fd.write(share.encode("hex") + "\n")
@@ -98,7 +99,9 @@ if __name__ == "__main__":
 			assert verify_share(share), "Invalid share."
 			shares.append(share)
 		block = join_shares(shares, common)
-		print block
+		fd = open(sys.argv[2], "w")
+		fd.write(block)
+		fd.close()
 	else:
 		print "usage: symsplit n k | symsplit common"
 		print "If 2 arguments:"
